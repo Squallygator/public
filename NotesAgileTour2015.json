@@ -1,0 +1,19 @@
+{
+  "Title" : "#ATBDX 2015 @atbdx @squallygator",
+  "Lang": "fr-FR",
+  "By" : "@squallygator",
+  "Links" : {
+    "Site de l'event" : "http://agiletourbordeaux.fr",
+    "Programme" : "http://agiletourbordeaux.fr/programme.html",
+    "Décider plus efficacement" : "http://fr.slideshare.net/ckti/decider-plus-efficacement",
+    "Merci ! by OAZ" : "http://agilitateur.azeau.com/post/2015/10/31/Agile-Tour-Bordeaux-2015-%3A-merci-!"
+  },
+  "Sessions":{
+    "Le bonheur sans travail": {
+      "At" : "9:15",
+      "By" : { "Lionel 'Ploum' Dricot" : {"Twitter" : "@ploum"} },
+	  "Pitch" : "Le bonheur sans travail\nLe travail est appelé à disparaitre car, par nature, il y aura un robot pour le faire à notre place\nIl est nécessaire de trouver une motivation, un sens à sa vie autre que le travail\nL’argent, symbole du travail, ne s’y prête pas.\nJe propose donc une nouvelle méthode de mesure de l’épanouissement à travers des unités de temps."
+	  "Comment" : "Rigolade de base pour tous, avec adhésion aux propos facultatif. \nWhat the fuck else ?"
+    }
+  }
+}
