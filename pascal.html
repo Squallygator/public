@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <title>Temps restant avant mon départ</title>
     <script>
-
         var TheFinalCountDown = (function () {
             var translates = {
                 weeks: 'semaine(s)',
@@ -22,55 +21,99 @@
                 seconds: 1000
             };
 
-            var ctor = function () {
-                var args = Array.prototype.slice.call(arguments);
-                var dateTicks = args.map(function (item) {
-                    if (typeof item === 'number')
-                        return item;
-                    else if (typeof item === 'object' && item instanceof Date)
-                        return item.getTime();
-                });
-                var reste = dateTicks.reverse().reduce(function (prev, courant) { return prev - courant; });
+            var getDateTime = function (item) {
+                if (typeof item === 'string')
+                    return Date.parse(item);
+                if (typeof item === 'number')
+                    return item;
+                else if (typeof item === 'object' && item instanceof Date)
+                    return item.getTime();
+                return new Date(0);
+            };
 
-                var base = this;
+            var ctor = function (dateDepart) {
+                this.dateDepart = getDateTime(dateDepart);
+            };
+            ctor.prototype.getRemainingTime = function() {
+                var dateArgs = new Array();
+                dateArgs.push(this.dateDepart);
+                dateArgs.push(Date.now());
+                return dateArgs.reduce(function(prev, courant) { return prev - courant; });
+            };
+
+            ctor.prototype.getData = function () {
+                var reste = this.getRemainingTime();
+                var base = {
+                    dateDepart: this.dateDepart
+                };
                 for (var key in factors) {
                     base[key] = Math.floor(reste / factors[key]);
                     reste -= base[key] * factors[key];
                 }
-            };
+                return base;
+            }
 
             ctor.prototype.toString = function () {
-                var base = this;
+                var base = this.getData();
                 var parts = Object.keys(translates).map(function (item) { return base[item] + ' ' + translates[item]; });
                 return parts.join(', ');
+            };
+
+            return ctor;
+        })();
+
+        var TheWritingOnTheWall = (function () {
+            var ctor = function (theFinalCountDown) {
+                this.theFinalCountDown = theFinalCountDown;
+            };
+
+            ctor.prototype.seekAndDestroy = function () {
+                document.getElementById('Restant').innerHTML = this.theFinalCountDown.toString();
+            };
+
+            ctor.prototype.isRunning = function (elt) {
+                return elt.getAttribute('data-stop') === elt.value;
+            }
+
+            ctor.prototype.start = function (elt) {
+                var that = this;
+                this.lastOfTheMohican = setInterval(function() {
+                    that.seekAndDestroy();
+                }, 1000);
+                if (elt)
+                    elt.value = elt.getAttribute('data-stop');
+            };
+
+            ctor.prototype.stop = function (elt) {
+                clearInterval(this.lastOfTheMohican);
+                if (elt)
+                    elt.value = elt.getAttribute('data-start');
+            }
+            ctor.prototype.startAndStop = function (elt) {
+                if (this.isRunning(elt))
+                    this.stop(elt);
+                else
+                    this.start(elt);
+            };
+
+            ctor.prototype.letGetThisStarted = function () {
+                debugger;
+                var that = this;
+                that.start();
+                document.getElementById('stopStartCountDown').onclick = function () { that.startAndStop(this) };
             };
             return ctor;
         })();
 
-        var departureDate = Date.parse('2016-04-15 16:00:00 GMT+0200');
-        var showCountDown = function () {
-            var countDown = new TheFinalCountDown(Date.now(), departureDate);
-            document.getElementById('Restant').innerHTML = countDown.toString();
-        };
-        var latestHandle;
-        var ready = function () {
-            latestHandle = setInterval(showCountDown, 1000);
-            document.getElementById('stopStartCountDown').onclick = function () {
-                if (this.getAttribute('data-stop') === this.value) {
-                    clearInterval(latestHandle);
-                    this.value = this.getAttribute('data-start');
-                    return;
-                }
-                latestHandle = setInterval(showCountDown, 1000);
-                this.value = this.getAttribute('data-stop');
-            };
-        };
+        var theWritingOnTheWall = new TheWritingOnTheWall(new TheFinalCountDown('2016-04-15 16:00:00 GMT+0200'));
     </script>
 </head>
 <body>
     <iframe src="//giphy.com/embed/jYAGkoghdmD9S" width="480" height="352" frameborder="0" class="giphy-embed" allowfullscreen></iframe>
     <div>Plus que <span id="Restant"></span></div>
-    <input type="button" id="stopStartCountDown" value="arrêter le décompte" data-stop="arrêter le décompte" data-start="reprendre le décompte"/>
-    <script>ready();</script>
+    <input type="button" id="stopStartCountDown" value="arrêter le décompte" data-stop="arrêter le décompte" data-start="reprendre le décompte" />
+    <script>
+        theWritingOnTheWall.letGetThisStarted();
+    </script>
 </body>
 </html>
