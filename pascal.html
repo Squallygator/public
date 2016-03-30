@@ -1,0 +1,76 @@
+<!doctype html>
+<html class="no-js" lang="fr-FR">
+<head>
+    <meta charset="utf-8" />
+    <title>Temps restant avant mon départ</title>
+    <script>
+
+        var TheFinalCountDown = (function () {
+            var translates = {
+                weeks: 'semaine(s)',
+                days: 'jour(s)',
+                hours: "heure(s)",
+                minutes: "minute(s)",
+                seconds: "seconde(s)"
+            };
+
+            var factors = {
+                weeks: (7 * 24 * 60 * 60 * 1000),
+                days: (24 * 60 * 60 * 1000),
+                hours: (60 * 60 * 1000),
+                minutes: (60 * 1000),
+                seconds: 1000
+            };
+
+            var ctor = function () {
+                var args = Array.prototype.slice.call(arguments);
+                var dateTicks = args.map(function (item) {
+                    if (typeof item === 'number')
+                        return item;
+                    else if (typeof item === 'object' && item instanceof Date)
+                        return item.getTime();
+                });
+                var reste = dateTicks.reverse().reduce(function (prev, courant) { return prev - courant; });
+
+                var base = this;
+                for (var key in factors) {
+                    base[key] = Math.floor(reste / factors[key]);
+                    reste -= base[key] * factors[key];
+                }
+            };
+
+            ctor.prototype.toString = function () {
+                var base = this;
+                var parts = Object.keys(translates).map(function (item) { return base[item] + ' ' + translates[item]; });
+                return parts.join(', ');
+            };
+            return ctor;
+        })();
+
+        var departureDate = Date.parse('2016-04-15 16:00:00 GMT+0200');
+        var showCountDown = function () {
+            var countDown = new TheFinalCountDown(Date.now(), departureDate);
+            document.getElementById('Restant').innerHTML = countDown.toString();
+        };
+        var latestHandle;
+        var ready = function () {
+            latestHandle = setInterval(showCountDown, 1000);
+            document.getElementById('stopStartCountDown').onclick = function () {
+                if (this.getAttribute('data-stop') === this.value) {
+                    clearInterval(latestHandle);
+                    this.value = this.getAttribute('data-start');
+                    return;
+                }
+                latestHandle = setInterval(showCountDown, 1000);
+                this.value = this.getAttribute('data-stop');
+            };
+        };
+    </script>
+</head>
+<body>
+    <iframe src="//giphy.com/embed/jYAGkoghdmD9S" width="480" height="352" frameborder="0" class="giphy-embed" allowfullscreen></iframe>
+    <div>Plus que <span id="Restant"></span></div>
+    <input type="button" id="stopStartCountDown" value="arrêter le décompte" data-stop="arrêter le décompte" data-start="reprendre le décompte"/>
+    <script>ready();</script>
+</body>
+</html>
